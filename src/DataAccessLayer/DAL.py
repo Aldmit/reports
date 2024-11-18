@@ -84,12 +84,77 @@ class Database:
             
 
 
-    def update_data(self) -> str:
-        pass
+    def update_data(self, data):
+            
+        match self._typeData:
+            case "users":
+                user_id = self._id
+                new_login = data._login
+                new_name = data._name
+                new_role = int(data._role)
+                new_clients = data._clients
+
+                try:
+                    with sq.connect(self.__bd_name) as conn: # Работа с подключением к БД через встроенный import sq
+                        cur = conn.cursor()
+                        # request = f"UPDATE {self._typeData} SET `login`={new_login},`name`={new_name},`role`={new_role},`clients_id`={new_clients} WHERE `user_id`={user_id}"
+                        # cur.execute(request)
+
+                        # Динамическое формирование SQL-запроса
+                        query = f"UPDATE {self._typeData} SET "
+                        params = []
+
+                        if new_login is not None:
+                            query += "login = ?, "
+                            params.append(new_login)
+                        if new_name is not None:
+                            query += "name = ?, "
+                            params.append(new_name)
+                        if new_role is not None:
+                            query += "role = ?, "
+                            params.append(new_role)
+                        if new_clients is not None:
+                            query += "clients_id = ?, "
+                            params.append(new_clients)
+
+                        # Удаляем лишнюю запятую и добавляем условие WHERE
+                        query = query.rstrip(", ") + " WHERE user_id = ?"
+                        params.append(user_id)
+
+                        # Выполняем запрос
+                        cur.execute(query, params)
+                        return "Данные успешно изменены"
+
+
+
+
+                except sq.Error as e:
+                    return f"Error inserting user: {e}"
+                
+                return f"Данные успешно изменены"
+
+            
+            case 'clients':  
+                new_login = data[1]
+                new_name = data[2]
+                new_ads = data[3]
+
+                try:
+                    with sq.connect(self.__bd_name) as conn: # Работа с подключением к БД через встроенный import sq
+                        cur = conn.cursor()
+                        request = f"UPDATE {self._typeData} SET name={new_name},ads={new_ads} WHERE login={self._login};"
+                        cur.execute(request)
+                except sq.Error as e:
+                    return f"Error inserting user: {e}"
+                
+                return f"Данные успешно изменены"
+
+            case _:
+                return f"Замена не была выполнена"
     
 
 
-    def insert_data(self) -> str:
+    def insert_data(self):
         match self._typeData:
             case 'user':  
                 user_id = self._id
@@ -98,25 +163,28 @@ class Database:
                 role = self._role
                 clients_id = json.dumps({0:" "})
 
-                conn = sq.connect(self.__bd_name) # Работа с подключением к БД через встроенный import sq
-                cur = conn.cursor()
-                cur.execute("INSERT INTO users(user_id, login, name, role, clients_id) VALUES ('%s', '%s', '%s', '%i', '%s')" %(user_id,login,name,role,clients_id))
-                conn.commit()
-                cur.close()
-                conn.close()
-                return f"User has insert: {user_id}, {login}, {name}, {role}, {clients_id}"
+                try:
+                    with sq.connect(self.__bd_name) as conn: # Работа с подключением к БД через встроенный import sq
+                        cur = conn.cursor()
+                        cur.execute("INSERT INTO users(user_id,login,name,role,clients_id) VALUES (?, ?, ?, ?, ?)",
+                                    (user_id,login,name,role,clients_id))
+                except sq.Error as e:
+                    return f"Error inserting user: {e}"
+                return f"User has insert: {user_id}, {login}, {name}, {role}"
 
             case 'client':  
                 login = self._login
                 name = self._name
                 ads = self._ads
 
-                conn = sq.connect(self.__bd_name) # Работа с подключением к БД через встроенный import sq
-                cur = conn.cursor()
-                cur.execute("INSERT INTO clients(login, name, ads) VALUES ('%s', '%s', '%i')" %(login,name,ads))
-                conn.commit()
-                cur.close()
-                conn.close()
+                try:
+                    with sq.connect(self.__bd_name) as conn: # Работа с подключением к БД через встроенный import sq
+                        cur = conn.cursor()
+                        cur.execute("INSERT INTO clients(login, name, ads) VALUES (?, ?, ?)",
+                                    (login,name,ads))
+                except sq.Error as e:
+                    return(f"Error inserting client: {e}")
+                
                 return f"Client has insert: {login}, {name}, {ads}"
             
             case 'budget':  
@@ -124,12 +192,13 @@ class Database:
                 budget = self._budget
                 date = self._date
 
-                conn = sq.connect(self.__bd_name) # Работа с подключением к БД через встроенный import sq
-                cur = conn.cursor()
-                cur.execute("INSERT INTO budgets(data, client_id, budget) VALUES ('%s', '%s', '%s')" %(date,client_id,budget))
-                conn.commit()
-                cur.close()
-                conn.close()
+                try:
+                    with sq.connect(self.__bd_name) as conn: # Работа с подключением к БД через встроенный import sq
+                        cur = conn.cursor()
+                        cur.execute("INSERT INTO budgets(data, client_id, budget) VALUES ('%s', '%s', '%s')" %(date,client_id,budget))
+                        
+                except sq.Error as e:
+                    return(f"Error inserting user: {e}")
                 return f"Budget has insert: {client_id}, {budget}"
             
             case 'click':  
@@ -137,12 +206,15 @@ class Database:
                 clicks = self._clicks
                 date = self._date
 
-                conn = sq.connect(self.__bd_name) # Работа с подключением к БД через встроенный import sq
-                cur = conn.cursor()
-                cur.execute("INSERT INTO clicks(data, client_id, clicks) VALUES ('%s', '%s', '%s')" %(date,client_id,clicks))
-                conn.commit()
-                cur.close()
-                conn.close()
+                try:
+                    with sq.connect(self.__bd_name) as conn: # Работа с подключением к БД через встроенный import sq
+                        cur = conn.cursor()
+                        cur.execute("INSERT INTO clicks(data, client_id, clicks) VALUES ('%s', '%s', '%s')" %(date,client_id,clicks))
+                        # conn.commit()
+                        # cur.close()
+                        # conn.close()
+                except sq.Error as e:
+                    return(f"Error inserting user: {e}")
                 return f"Clicks has insert: {client_id}, {budget}"
 
             case 'view':  
@@ -150,12 +222,16 @@ class Database:
                 views = self._views
                 date = self._date
 
-                conn = sq.connect(self.__bd_name) # Работа с подключением к БД через встроенный import sq
-                cur = conn.cursor()
-                cur.execute("INSERT INTO views(data, client_id, views) VALUES ('%s', '%s', '%s')" %(date,client_id,views))
-                conn.commit()
-                cur.close()
-                conn.close()
+                try:
+                    with sq.connect(self.__bd_name) as conn:# Работа с подключением к БД через встроенный import sq
+                        cur = conn.cursor()
+                        cur.execute("INSERT INTO views(data, client_id, views) VALUES ('%s', '%s', '%s')" %(date,client_id,views))
+                        # conn.commit()
+                        # cur.close()
+                        # conn.close()
+                        
+                except sq.Error as e:
+                    return(f"Error inserting user: {e}")
                 return f"Views has insert: {client_id}, {views}"
             
             case 'cost':  
@@ -163,12 +239,16 @@ class Database:
                 costs = self._costs
                 date = self._date
 
-                conn = sq.connect(self.__bd_name) # Работа с подключением к БД через встроенный import sq
-                cur = conn.cursor()
-                cur.execute("INSERT INTO costs(data, client_id, costs) VALUES ('%s', '%s', '%s')" %(date,client_id,costs))
-                conn.commit()
-                cur.close()
-                conn.close()
+                try:
+                    with sq.connect(self.__bd_name) as conn: # Работа с подключением к БД через встроенный import sq
+                        cur = conn.cursor()
+                        cur.execute("INSERT INTO costs(data, client_id, costs) VALUES ('%s', '%s', '%s')" %(date,client_id,costs))
+                        # conn.commit()
+                        # cur.close()
+                        # conn.close()
+                        
+                except sq.Error as e:
+                    return(f"Error inserting user: {e}")
                 return f"Costs has insert: {client_id}, {costs}"
             
             case _:
@@ -178,91 +258,109 @@ class Database:
 
     
     def create_tables(self) -> None:
+        try:
+            with sq.connect(self.__bd_name) as conn: # USERS
+                cur = conn.cursor()
+                cur.execute(f'''CREATE TABLE IF NOT EXISTS users (
+                            user_id varchar(100) primary key, 
+                            login varchar(100) NOT NULL,
+                            name varchar(100) NOT NULL,
+                            role TINYINT UNSIGNED NOT NULL,
+                            clients_id text,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                            )''')
+                conn.commit()
+                cur.close()
+                conn.close()
+                print("Tab users has created\n\n")
 
-        conn = sq.connect(self.__bd_name) # USERS
-        cur = conn.cursor()
-        cur.execute(f'''CREATE TABLE IF NOT EXISTS users (
-                    user_id varchar(100) primary key, 
-                    login varchar(100) NOT NULL,
-                    name varchar(100) NOT NULL,
-                    role TINYINT UNSIGNED NOT NULL,
-                    clients_id varchar(65535),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )''')
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("Tab users has created\n\n")
+        except sq.Error as e:
+            print(f"Error creating table: {e}")
 
+        try:
+            with sq.connect(self.__bd_name) as conn: # CLIENTS
+                cur = conn.cursor()
+                cur.execute(f'''CREATE TABLE IF NOT EXISTS clients (
+                            id int UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+                            login varchar(200) NOT NULL,
+                            name varchar(200) NOT NULL,
+                            ads tinyint NOT NULL,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                            )''')
+                conn.commit()
+                cur.close()
+                conn.close()
+                print("Tab clients has created\n\n")
         
-        conn = sq.connect(self.__bd_name) # CLIENTS
-        cur = conn.cursor()
-        cur.execute(f'''CREATE TABLE IF NOT EXISTS clients (
-                    id int UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
-                    login varchar(200) NOT NULL,
-                    name varchar(200) NOT NULL,
-                    ads tinyint NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )''')
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("Tab clients has created\n\n")
+        except sq.Error as e:
+            print(f"Error creating table: {e}")
         
+        try:
+            with sq.connect(self.__bd_name) as conn:  # BUDGETS
+                cur = conn.cursor()
+                cur.execute(f'''CREATE TABLE IF NOT EXISTS budgets (
+                            id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                            date DATE NOT NULL,
+                            client_id int NOT NULL,
+                            budget decimal(13,2)
+                            )''')
+                conn.commit()
+                cur.close()
+                conn.close()
+                print("Tab budgets has created\n\n")
         
-        conn = sq.connect(self.__bd_name) # BUDGETS
-        cur = conn.cursor()
-        cur.execute(f'''CREATE TABLE IF NOT EXISTS budgets (
-                    id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                    date DATE NOT NULL,
-                    client_id int NOT NULL,
-                    budget decimal(13,2)
-                    )''')
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("Tab budgets has created\n\n")
+        except sq.Error as e:
+            print(f"Error creating table: {e}")
         
+        try:
+            with sq.connect(self.__bd_name) as conn:  # CLICKS
+                cur = conn.cursor()
+                cur.execute(f'''CREATE TABLE IF NOT EXISTS clicks (
+                            id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                            date DATE NOT NULL,
+                            client_id int NOT NULL,
+                            clicks int
+                            )''')
+                conn.commit()
+                cur.close()
+                conn.close()
+                print("Tab clicks has created\n\n")
         
-        conn = sq.connect(self.__bd_name) # CLICKS
-        cur = conn.cursor()
-        cur.execute(f'''CREATE TABLE IF NOT EXISTS clicks (
-                    id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                    date DATE NOT NULL,
-                    client_id int NOT NULL,
-                    clicks int
-                    )''')
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("Tab clicks has created\n\n")
+        except sq.Error as e:
+            print(f"Error creating table: {e}")
 
+        try:
+            with sq.connect(self.__bd_name) as conn: # VIEWS
+                cur = conn.cursor()
+                cur.execute(f'''CREATE TABLE IF NOT EXISTS views (
+                            id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                            date DATE NOT NULL,
+                            client_id int NOT NULL,
+                            views int
+                            )''')
+                conn.commit()
+                cur.close()
+                conn.close()
+                print("Tab views has created\n\n")
         
-        conn = sq.connect(self.__bd_name) # VIEWS
-        cur = conn.cursor()
-        cur.execute(f'''CREATE TABLE IF NOT EXISTS views (
-                    id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                    date DATE NOT NULL,
-                    client_id int NOT NULL,
-                    views int
-                    )''')
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("Tab views has created\n\n")
+        except sq.Error as e:
+            print(f"Error creating table: {e}")
+ 
+        try:
+            with sq.connect(self.__bd_name) as conn: # COSTS
+                cur = conn.cursor()
+                cur.execute(f'''CREATE TABLE IF NOT EXISTS costs (
+                            id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                            date DATE NOT NULL,
+                            client_id int NOT NULL,
+                            costs decimal(13,2)
+                            )''')
+                conn.commit()
+                cur.close()
+                conn.close()
+                print("Tab costs has created\n\n")
 
-        
-        conn = sq.connect(self.__bd_name) # COSTS
-        cur = conn.cursor()
-        cur.execute(f'''CREATE TABLE IF NOT EXISTS costs (
-                    id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                    date DATE NOT NULL,
-                    client_id int NOT NULL,
-                    costs decimal(13,2)
-                    )''')
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("Tab costs has created\n\n")
+        except sq.Error as e:
+            print(f"Error creating table: {e}")
 
         

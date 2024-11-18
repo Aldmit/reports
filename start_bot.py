@@ -9,7 +9,7 @@ from src import *
 # Запуск процесса поллинга новых апдейтов
 async def main():
 
-    # turn_on_logging()
+    turn_on_logging()
     config: Config = load_config()
     BOT_TOKEN: str = config.bot.token
 
@@ -28,19 +28,21 @@ async def main():
 
     Database().create_tables()
 
-    dp.include_router(MainInterface.router)
-    dp.include_router(BudgetsInterface.router)
-    dp.include_router(ClientsInterface.router)
-    dp.include_router(StatisticsInterface.router)
-    dp.include_router(UsersInterface.router)
+    dp.include_router(Main_Interface.router)
+    dp.include_router(Budgets_Interface.router)
+    dp.include_router(Clients_Interface.router)
+    dp.include_router(Statistics_Interface.router)
+    dp.include_router(Users_Interface.router)
 
 
     await dp.start_polling(bot)
 
-    
-    def turn_on_logging():    
-        # Включаем логирование, чтобы не пропустить важные сообщения
-        logging.basicConfig(level=logging.INFO)
+
+
+def turn_on_logging():    
+    # Включаем логирование, чтобы не пропустить важные сообщения
+    logging.basicConfig(level=logging.INFO)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
