@@ -12,7 +12,7 @@ class Config:
 @dataclass
 class Yandex:
     yaToken: str
-    yaReportURL: str
+    yaReportsURL: str
 
 # Создаем функцию, которая будет читать файл .env и возвращать экземпляр
 # класса Config с заполненными полями token и admin_ids

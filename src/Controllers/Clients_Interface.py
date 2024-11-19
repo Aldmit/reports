@@ -27,8 +27,8 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
             buttons = [
                 [types.InlineKeyboardButton(text="Показать всех клиентов", callback_data="show_clients")],
                 [types.InlineKeyboardButton(text="Добавить клиента", callback_data="add_clients")],
-                [types.InlineKeyboardButton(text="Обновить текущего клиента", callback_data="update_clients")],
-                [types.InlineKeyboardButton(text="Удалить клиента", callback_data="rem_clients")]
+                # [types.InlineKeyboardButton(text="Обновить текущего клиента", callback_data="update_clients")],
+                # [types.InlineKeyboardButton(text="Удалить клиента", callback_data="rem_clients")]
             ]
             keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
             return keyboard

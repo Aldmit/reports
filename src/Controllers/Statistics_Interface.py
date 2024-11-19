@@ -25,7 +25,7 @@ router = Router()
 
 
 
-@router.callback_query(F.data == "all_stats1111")
+@router.callback_query(F.data == "all_stats")
 async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Status.Mode_reports)
 
@@ -80,9 +80,9 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
      
     def get_keyboard():
             buttons = [
-                [types.InlineKeyboardButton(text="Аврора СПБ", callback_data="0")],
-                [types.InlineKeyboardButton(text="ДинамикаДвижения", callback_data="1")],
-                [types.InlineKeyboardButton(text="Геосервис", callback_data="2")],
+                [types.InlineKeyboardButton(text="Аврора СПБ", callback_data="0")]
+                # [types.InlineKeyboardButton(text="ДинамикаДвижения", callback_data="1")],
+                # [types.InlineKeyboardButton(text="Геосервис", callback_data="2")],
             ]
             keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
             return keyboard
@@ -95,8 +95,13 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
     await state.set_state(Status.Mode_reports)
      
     yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+
+    print(f"\n\n{yesterday}\n\n")
+
     df = Service_yd.get_report('avrorakuhni-spb', 1)
     x = df.loc[[yesterday],['Impressions', 'Clicks', 'Cost']]
+
+    print(x)
 
     view = int(x.iloc[0,0])
     click = int(x.iloc[0,1])

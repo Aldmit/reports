@@ -29,7 +29,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 # [types.InlineKeyboardButton(text="Работа с планами", callback_data="budgets_mode")],
                 [types.InlineKeyboardButton(text="Работа с клиентами", callback_data="clients_mode")],
                 [types.InlineKeyboardButton(text="Работа с пользователями", callback_data="users_mode")],
-                # [types.InlineKeyboardButton(text="Получить статистику", callback_data="reports_mode")],
+                [types.InlineKeyboardButton(text="Получить статистику", callback_data="reports_mode")],
             ]
             keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
             return keyboard
@@ -70,14 +70,14 @@ async def cmd_start(message: types.Message, state: FSMContext):
 #     await callback.message.answer(f"Выберите, что хотите сделать с клиентами", reply_markup=get_keyboard())
 
 
-@router.callback_query(F.data == "get_reports")
+@router.callback_query(F.data == "reports_mode")
 async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Status.Mode_reports)
     
     def get_keyboard():
             buttons = [
                 # [types.InlineKeyboardButton(text="Получить всю статистику", callback_data="all_stats")],
-                [types.InlineKeyboardButton(text="Получить статистику за прношлый день", callback_data="yesterday")],
+                [types.InlineKeyboardButton(text="Получить статистику за прошлый день", callback_data="yesterday")]
                 # [types.InlineKeyboardButton(text="Получить статистику за прношлую неделю", callback_data="last_week")],
                 # [types.InlineKeyboardButton(text="Получить статистику за проошлый месяц", callback_data="last_month")],
             ]

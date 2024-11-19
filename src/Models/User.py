@@ -23,6 +23,19 @@ class User:
             # stats_data.append([View(i,)])
             pass
         
+        
+    def get_users_clients(self):
+        users = User().get_users()
+        clients = list()
+        text = ""
+        for user in users:
+            text += f'<b>{user[1]} - ({user[0]})</b>:\n'
+            clients = (User(user[0]).get_clients())
+            for i in clients:
+                text += f'▶ {i}\n'
+            text += '\n'
+        return text
+
 
     def get_clients(self):
         clients_list = list()

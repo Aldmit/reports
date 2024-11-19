@@ -27,12 +27,12 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
                 [types.InlineKeyboardButton(text="Показать всех пользователей", callback_data="show_users")],
                 [types.InlineKeyboardButton(text="Показать клиентов пользователей", callback_data="showclients_users")],
                 [
-                    types.InlineKeyboardButton(text="Добавить клиента пользователю", callback_data="addclients_users"),
-                    types.InlineKeyboardButton(text="Удалить клиента у пользователя", callback_data="remclients_users")
+                    types.InlineKeyboardButton(text="Добавить клиента пользователю", callback_data="addclients_users")
+                    # types.InlineKeyboardButton(text="Удалить клиента у пользователя", callback_data="remclients_users")
                 ],
-                [types.InlineKeyboardButton(text="Создать нового пользователя", callback_data="create_users")],
-                [types.InlineKeyboardButton(text="Обновить текущего пользователя", callback_data="update_users")],
-                [types.InlineKeyboardButton(text="Удалить пользователя", callback_data="delete_users")]
+                [types.InlineKeyboardButton(text="Создать нового пользователя", callback_data="create_users")]
+                # [types.InlineKeyboardButton(text="Обновить текущего пользователя", callback_data="update_users")],
+                # [types.InlineKeyboardButton(text="Удалить пользователя", callback_data="delete_users")]
             ]
             keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
             return keyboard
@@ -57,15 +57,9 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
 async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Status.Mode_users_showclients)
 
+    text = User().get_users_clients()
 
-    clients = User(callback.from_user.id).get_clients()
-    text = ""
-    for i in clients:
-        text += f'--> {i}'
-
-
-
-    await callback.message.answer(f"Клиенты пользователя {callback.from_user.id}:\n{text}")
+    await callback.message.answer(f"Вот список пользователей и их клиентов:\n{text}")
 
 
 

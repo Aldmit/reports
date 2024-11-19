@@ -77,7 +77,7 @@ def get_report(clientLogin, mode=0):
     path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     if mode == 0:
         config: Yandex = load_ya_config()
-        ReportsURL: str = config.yaReportURL
+        ReportsURL: str = config.yaReportsURL
         token: str = config.yaToken
 
 
@@ -111,8 +111,8 @@ def get_report(clientLogin, mode=0):
         body = {
             "params": {
                 "SelectionCriteria": {
-                    "DateFrom": "2024-10-11",
-                    "DateTo": "2024-11-11"
+                    "DateFrom": "2024-11-01",
+                    "DateTo": "2024-11-18"
                 },
                 "FieldNames": [
                     "Date",
