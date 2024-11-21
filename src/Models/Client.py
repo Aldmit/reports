@@ -20,3 +20,6 @@ class Client:
 
     def get_clients(self):
         return Database("", 'clients').get_data()
+        
+    def delete_client(self):
+        return Database("", 'client', [self._login]).delete_data()

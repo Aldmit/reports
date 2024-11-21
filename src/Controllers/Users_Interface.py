@@ -27,8 +27,8 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
                 [types.InlineKeyboardButton(text="Показать всех пользователей", callback_data="show_users")],
                 [types.InlineKeyboardButton(text="Показать клиентов пользователей", callback_data="showclients_users")],
                 [
-                    types.InlineKeyboardButton(text="Добавить клиента пользователю", callback_data="addclients_users")
-                    # types.InlineKeyboardButton(text="Удалить клиента у пользователя", callback_data="remclients_users")
+                    types.InlineKeyboardButton(text="Добавить клиента пользователю", callback_data="addclients_users"),
+                    types.InlineKeyboardButton(text="Удалить клиента у пользователя", callback_data="remclients_users")
                 ],
                 [types.InlineKeyboardButton(text="Создать нового пользователя", callback_data="create_users")]
                 # [types.InlineKeyboardButton(text="Обновить текущего пользователя", callback_data="update_users")],
@@ -95,12 +95,12 @@ async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
 
         request = User(user._id, client._login).add_client()
         user = User(message.chat.id).get_current_user_info()
-        await message.answer(f"{request} {user}")
-
+        await message.answer(f"{request}.")
+        return
     except:
         await message.answer(
-            "Ошибка: неправильный формат ввода. Попробуйте ещё раз:\n"
-            "user_chat_id @tg_login name role"
+            "Ошибка: неправильный формат ввода.\nПопробуйте ещё раз:\n"
+            "1192983 bestwindows_spb"
         )
         return
 
@@ -112,8 +112,31 @@ async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
 @router.callback_query(F.data == "remclients_users")
 async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Status.Mode_users_remclient)
-    await callback.message.answer(f"Выберите необходимую функцию из предложенных ниже.")
+    await callback.message.answer(f"Введите ниже идентификатор пользователя и логин клиента, чтобы удалить клиента у пользователя.\nПример:\n1192983 bestwindows_spb")
 
+@router.message(Status.Mode_users_remclient, F.text)
+async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
+    # (message.from_user.username, message.chat.id)
+    split_message = message.text.split(' ', maxsplit=1)
+
+    try:
+        if split_message[0] is None:
+            await message.answer("Ошибка: переданы не все аргументы")
+            return
+        
+        user = User(split_message[0]).get_current_user_info()
+        client = Client(split_message[1]).get_current_client_info()
+
+        request = User(user._id, client._login).rem_client()
+        user = User(message.chat.id).get_current_user_info()
+        await message.answer(f"{request}.")
+        return
+    except:
+        await message.answer(
+            "Ошибка: неправильный формат ввода.\nПопробуйте ещё раз:\n"
+            "1192983 bestwindows_spb"
+        )
+        return
 
 
 

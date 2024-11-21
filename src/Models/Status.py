@@ -17,6 +17,13 @@ class Status(StatesGroup):
     
 
     Mode_reports = State()
+    Mode_reports_download = State()
+    Mode_reports_yesterday = State()
+    Mode_reports_lastweek = State()
+    Mode_reports_lastmonth = State()
+
+    Mode_reports_custom_input = State()
+    Mode_reports_custom_output = State()
     
 
     Mode_users = State()

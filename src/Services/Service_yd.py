@@ -72,7 +72,7 @@ def get_path():
     print(path)
     print(f"{path}/Reports/Client...")
 
-def get_report(clientLogin, mode=0):
+def get_report(clientLogin, mode=0, data_from=0, data_to=0):
     
     path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     if mode == 0:

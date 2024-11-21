@@ -43,7 +43,7 @@ class User:
         clients = json.loads(user._clients)
         for client in clients:
             if client != '0':
-                clients_list.append(clients[client]) # тут надо смотреть чё выдаёт
+                clients_list.append(clients[client]) 
                 print(clients_list)
         return clients_list
     
@@ -62,6 +62,18 @@ class User:
         user._clients = json.dumps(clients)
         User(self._id).update_user(user)
         return "Информация пользователя обновлена"
+
+    def rem_client(self):
+        user = User(self._id).get_current_user_info()
+        clients = json.loads(user._clients)
+        for client in clients.items():
+            if client[1] == self._login:
+                del clients[client[0]]
+                break
+        user._clients = json.dumps(clients)
+        User(self._id).update_user(user)
+        return "Информация пользователя обновлена"
+
 
 
 

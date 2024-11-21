@@ -363,4 +363,30 @@ class Database:
         except sq.Error as e:
             print(f"Error creating table: {e}")
 
-        
+
+
+    def delete_data(self):
+        match self._typeData:
+            case 'user':  
+                user_id = self._id
+
+                try:
+                    with sq.connect(self.__bd_name) as conn:  # Автоматическое управление подключением
+                        cur = conn.cursor()
+                        cur.execute("DELETE FROM users WHERE user_id = ?", (user_id))
+                        conn.commit() 
+                except sq.Error as e:
+                    return f"Error deleting client: {e}"
+                return f"Client {user_id} has been deleted."
+
+            case 'client':  
+                login = self._login
+                try:
+                    with sq.connect(self.__bd_name) as conn:  # Автоматическое управление подключением
+                        cur = conn.cursor()
+                        cur.execute("DELETE FROM clients WHERE login = ?", (login))
+                        conn.commit() 
+                except sq.Error as e:
+                    return f"Error deleting client: {e}"
+                
+                return f"Client {login} has been deleted."

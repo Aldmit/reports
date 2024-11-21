@@ -11,6 +11,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder # Инлайновые 
 
 from aiogram import Router
 from src.Models.Status import Status
+from src.Models.User import User
 
 
 # Инициализируем роутер уровня модуля
@@ -24,6 +25,15 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
     await message.answer(f"Добро пожаловать в Adwin Reports Bot. Ваш пользовательский идентификатор: {message.chat.id}")
 
+    try:
+        user = User(message.chat.id).get_current_user_info()
+        if int(user._id) != message.chat.id:
+            await message.answer("Для использования сервиса необходимо запросить регистрацию у администратора.")
+            return
+    except:
+        await message.answer("Для использования сервиса необходимо запросить регистрацию у администратора.")
+        return
+    
     def get_keyboard():
             buttons = [
                 # [types.InlineKeyboardButton(text="Работа с планами", callback_data="budgets_mode")],
@@ -34,6 +44,8 @@ async def cmd_start(message: types.Message, state: FSMContext):
             keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
             return keyboard
     await message.answer(f"Выберите что нужно сделать", reply_markup=get_keyboard())
+
+
     
 
 
@@ -68,20 +80,3 @@ async def cmd_start(message: types.Message, state: FSMContext):
 #             keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
 #             return keyboard
 #     await callback.message.answer(f"Выберите, что хотите сделать с клиентами", reply_markup=get_keyboard())
-
-
-@router.callback_query(F.data == "reports_mode")
-async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Status.Mode_reports)
-    
-    def get_keyboard():
-            buttons = [
-                # [types.InlineKeyboardButton(text="Получить всю статистику", callback_data="all_stats")],
-                [types.InlineKeyboardButton(text="Получить статистику за прошлый день", callback_data="yesterday")]
-                # [types.InlineKeyboardButton(text="Получить статистику за прношлую неделю", callback_data="last_week")],
-                # [types.InlineKeyboardButton(text="Получить статистику за проошлый месяц", callback_data="last_month")],
-            ]
-            keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
-            return keyboard
-    await callback.message.answer(f"Выберите что хотите сделать со статистикой", reply_markup=get_keyboard())
-

@@ -28,12 +28,13 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
                 [types.InlineKeyboardButton(text="Показать всех клиентов", callback_data="show_clients")],
                 [types.InlineKeyboardButton(text="Добавить клиента", callback_data="add_clients")],
                 # [types.InlineKeyboardButton(text="Обновить текущего клиента", callback_data="update_clients")],
-                # [types.InlineKeyboardButton(text="Удалить клиента", callback_data="rem_clients")]
+                [types.InlineKeyboardButton(text="Удалить клиента", callback_data="rem_clients")]
             ]
             keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
             return keyboard
     
     await callback.message.answer(f"Выберите необходимую функцию из предложенных ниже.", reply_markup=get_keyboard())
+
 
 
 @router.callback_query(F.data == "show_clients")
@@ -45,8 +46,6 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
     for client in clients:
         answer += f"<b>Название: {client[2]}</b>\nЛогин: {client[1]} | РК: {client[3]}\n\n" 
     await callback.message.answer(f"<b>Список текущих клиентов:</b>\n{answer}")
-
-
 
 
 
@@ -76,6 +75,42 @@ async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
         request = Client(split_message[0],split_message[1],split_message[2]).create_client()
         await message.answer(request)
 
+    except:
+        await message.answer(
+            "Ошибка: неправильный формат ввода. Попробуйте ещё раз:\n"
+            "user_chat_id @tg_login name role"
+        )
+        return
+    
+
+
+    
+@router.callback_query(F.data == "rem_clients")
+async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
+    await state.set_state(Status.Mode_clients_delete)
+    await callback.message.answer(f"Введите ниже логин клиента и рекламную систему, которого необходимо удалить. \n\nДанные следует вводить следующим образом:\nclient_login ads\n\nlogin - логин клиентского кабинета\nads - рекламная система (yandex, vk)\n\nПример:\nbeautywindows_spb yandex")
+
+
+@router.message(Status.Mode_clients_delete, F.text)
+async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
+    # (message.from_user.username, message.chat.id)
+    split_message = message.text.split(' ', maxsplit=1)
+
+    try:
+        if split_message[0] is None:
+            await message.answer("Ошибка: переданы не все аргументы")
+            return
+        match split_message[1]:
+            case "yandex":
+                split_message[1] = 1
+            case "vk":
+                split_message[1] = 2
+            case _:
+                pass
+        request = Client(split_message[0],split_message[1],split_message[2]).delete_client()
+        await message.answer(request)
+        await state.set_state(Status.Mode_clients)      
+        return
     except:
         await message.answer(
             "Ошибка: неправильный формат ввода. Попробуйте ещё раз:\n"
