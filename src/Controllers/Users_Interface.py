@@ -27,8 +27,8 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
                 [types.InlineKeyboardButton(text="Показать всех пользователей", callback_data="show_users")],
                 [types.InlineKeyboardButton(text="Показать клиентов пользователей", callback_data="showclients_users")],
                 [
-                    types.InlineKeyboardButton(text="Добавить клиента пользователю", callback_data="addclients_users"),
-                    types.InlineKeyboardButton(text="Удалить клиента у пользователя", callback_data="remclients_users")
+                    types.InlineKeyboardButton(text="Подвязать клиента", callback_data="addclients_users"),
+                    types.InlineKeyboardButton(text="Отвязать клиента", callback_data="remclients_users")
                 ],
                 [types.InlineKeyboardButton(text="Создать нового пользователя", callback_data="create_users")]
                 # [types.InlineKeyboardButton(text="Обновить текущего пользователя", callback_data="update_users")],
@@ -38,6 +38,8 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
             return keyboard
     
     await callback.message.answer(f"Выберите необходимую функцию из предложенных ниже.", reply_markup=get_keyboard())
+
+
 
 
 
@@ -53,6 +55,8 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
 
 
 
+
+
 @router.callback_query(F.data == "showclients_users")
 async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Status.Mode_users_showclients)
@@ -63,16 +67,6 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
 
 
 
-
-
-# @router.message(Status.Mode_users_create, F.text)
-# async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
-    # (message.from_user.username, message.chat.id)
-
-    # hanzi = await irg_generate(message.from_user.username, message.chat.id)
-    # await message.answer(f"{hanzi[0]} - <tg-spoiler>{hanzi[1]}</tg-spoiler> - {hanzi[2]}\n")
-    # pass    
-    
 
     
 @router.callback_query(F.data == "addclients_users")
@@ -103,8 +97,6 @@ async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
             "1192983 bestwindows_spb"
         )
         return
-
-
 
 
 
@@ -159,7 +151,7 @@ async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
         request = User(split_message[0],split_message[1],split_message[2],split_message[3]).create_user()
         await message.answer(request)
 
-    except:
+    except Exception:
         await message.answer(
             "Ошибка: неправильный формат ввода. Попробуйте ещё раз:\n"
             "user_chat_id @tg_login name role"

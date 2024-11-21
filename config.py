@@ -27,3 +27,8 @@ def load_ya_config(path: str | None = None) -> Yandex:
     env.read_env(path)
     return Yandex(yaReportsURL=env('YANDEX_REPORTS_URL'), yaToken=env('YANDEX_TOKEN'))
 
+def load_admin_id(path: str | None = None) -> str:
+    env = Env()
+    env.read_env(path)
+    return env('ADMIN_ID')
+

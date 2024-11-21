@@ -72,7 +72,7 @@ def get_path():
     print(path)
     print(f"{path}/Reports/Client...")
 
-def get_report(clientLogin, mode=0, data_from=0, data_to=0):
+def get_report(clientLogin, mode=0, data_from="2024-10-01", data_to="2024-10-31"):
     
     path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     if mode == 0:
@@ -111,8 +111,8 @@ def get_report(clientLogin, mode=0, data_from=0, data_to=0):
         body = {
             "params": {
                 "SelectionCriteria": {
-                    "DateFrom": "2024-11-01",
-                    "DateTo": "2024-11-18"
+                    "DateFrom": data_from,
+                    "DateTo": data_to
                 },
                 "FieldNames": [
                     "Date",

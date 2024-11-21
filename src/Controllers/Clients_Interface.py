@@ -43,8 +43,17 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
 
     clients = Client(callback.from_user.id).get_clients()
     answer = ""
+    ads = ""
     for client in clients:
-        answer += f"<b>Название: {client[2]}</b>\nЛогин: {client[1]} | РК: {client[3]}\n\n" 
+        match client[3]:
+            case 1:
+                ads = "yandex"
+            case 2:
+                ads = "vk"
+            case _:
+                pass   
+             
+        answer += f"<b>Название</b>: {client[2]}\n{client[1]} | {ads}\n\n" 
     await callback.message.answer(f"<b>Список текущих клиентов:</b>\n{answer}")
 
 
