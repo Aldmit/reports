@@ -35,7 +35,7 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
     def get_keyboard():
             buttons = [
                 [types.InlineKeyboardButton(text="Обновить всю статистику за 3 мес", callback_data="all_stats")],
-                # [types.InlineKeyboardButton(text="Получить статистику за прошлый день", callback_data="yesterday")],
+                [types.InlineKeyboardButton(text="Получить статистику за прошлый день", callback_data="yesterday")],
                 # [types.InlineKeyboardButton(text="Получить статистику за прошлую неделю", callback_data="last_week")],
                 # [types.InlineKeyboardButton(text="Получить статистику за прошлый месяц", callback_data="last_month")],
                 [types.InlineKeyboardButton(text="Получить статистику за период (сумма)", callback_data="custom_date")]
@@ -90,9 +90,8 @@ async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext
     await callback.message.answer(f"Выберите клиента по которому требуется показать данные.\n Вам доступны следующие клиенты:", reply_markup=get_keyboard())
 
 
-@router.callback_query(F.data)
+@router.callback_query(Status.Mode_reports_yesterday,  F.data)
 async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Status.Mode_reports_yesterday)
     clients = Client().get_clients()
     for client in clients:
         if callback.data in client[1]:
@@ -129,6 +128,10 @@ async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
             return
         
         clients = Client().get_clients()
+
+        for client in clients:
+            # (None, 'avrorakuhni-spb', 'АврораСПБ', 'yandex', '2024-11-16 12:17:39')
+            client[1]
         
         # for client in clients:
         #     if callback.data in client[1]:
@@ -165,22 +168,22 @@ async def get_message_base(message: types.Message, bot: Bot, state: FSMContext):
 
 
 
-@router.callback_query(F.data)
-async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
-    await state.set_state(Status.Mode_reports_custom)
-    clients = Client().get_clients()
-    for client in clients:
-        if callback.data in client[1]:
+# @router.callback_query(Status.Mode_reports, F.data)
+# async def start_chinese_train_1(callback: types.CallbackQuery, state: FSMContext):
+#     await state.set_state(Status.Mode_reports_custom_input)
+#     clients = Client().get_clients()
+#     for client in clients:
+#         if callback.data in client[1]:
 
-            yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+#             yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 
-            df = Service_yd.get_report(client[1], 1)
-            x = df.loc[[yesterday],['Impressions', 'Clicks', 'Cost']]
+#             df = Service_yd.get_report(client[1], 1)
+#             x = df.loc[[yesterday],['Impressions', 'Clicks', 'Cost']]
 
-            view = int(x.iloc[0,0])
-            click = int(x.iloc[0,1])
-            cost =x.iloc[0,2]
-            cpc = cost/click
+#             view = int(x.iloc[0,0])
+#             click = int(x.iloc[0,1])
+#             cost =x.iloc[0,2]
+#             cpc = cost/click
 
-            await callback.message.answer(f"Данные по клиенту {client[2]} на {yesterday}:\nПросмотры: {view} \nКлики: {click} \nРасход: {cost} \nСРС: {math.round(cpc,2)}")
+#             await callback.message.answer(f"Данные по клиенту {client[2]} на {yesterday}:\nПросмотры: {view} \nКлики: {click} \nРасход: {cost} \nСРС: {math.round(cpc,2)}")
 

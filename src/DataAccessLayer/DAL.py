@@ -125,9 +125,6 @@ class Database:
                         cur.execute(query, params)
                         return "Данные успешно изменены"
 
-
-
-
                 except sq.Error as e:
                     return f"Error inserting user: {e}"
                 

@@ -44,7 +44,7 @@ class User:
         for client in clients:
             if client != '0':
                 clients_list.append(clients[client]) 
-                print(clients_list)
+                
         return clients_list
     
 
